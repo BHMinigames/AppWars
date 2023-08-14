@@ -54,14 +54,15 @@ public final class Loc implements CommandExecutor, TabCompleter {
         SetSpawn.center(p);
 
         final Location location = p.getLocation();
-        if (i == 1) {
+        if (i == 1)
             arena.setLoc1(location);
-        } else {
+        else if (i == 2)
             arena.setLoc2(location);
-        }
+        else
+            arena.setViewLoc(location);
 
         arena.saveLocations();
-        p.sendMessage(ChatColor.GREEN + "Saved location " + (i == 1 ? 1 : 2) + " to arena " + arena.getName() + ".");
+        p.sendMessage(ChatColor.GREEN + "Saved location " + (i <= 2 ? i : "view") + " to arena " + arena.getName() + ".");
         return true;
     }
 

@@ -3,6 +3,7 @@ package dev.fluyd.appwars;
 import dev.fluyd.appwars.commands.*;
 import dev.fluyd.appwars.game.GameManager;
 import dev.fluyd.appwars.listeners.InitListeners;
+import dev.fluyd.appwars.listeners.KillTrackerListener;
 import dev.fluyd.appwars.listeners.PlayerListener;
 import dev.fluyd.appwars.listeners.WorldListener;
 //import dev.fluyd.spigotcore.CoreProvider;
@@ -40,6 +41,7 @@ public final class AppWars extends JavaPlugin {
     private void registerListeners() {
         this.registerListener(new PlayerListener());
         this.registerListener(new WorldListener());
+        this.registerListener(new KillTrackerListener());
     }
 
     private void registerListener(final Listener listener) {
@@ -51,6 +53,7 @@ public final class AppWars extends JavaPlugin {
         Bukkit.getPluginCommand("test").setExecutor(new TestCommand());
         Bukkit.getPluginCommand("setspawn").setExecutor(new SetSpawn());
         Bukkit.getPluginCommand("spawn").setExecutor(new Spawn());
+        Bukkit.getPluginCommand("start").setExecutor(new Start());
         Bukkit.getPluginCommand("loc").setExecutor(new Loc());
     }
 

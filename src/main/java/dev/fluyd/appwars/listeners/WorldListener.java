@@ -5,6 +5,7 @@ import dev.fluyd.appwars.game.GameManager;
 import dev.fluyd.appwars.game.arena.Arena;
 import dev.fluyd.appwars.utils.GameState;
 import dev.fluyd.appwars.utils.MessagesUtils;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Entity;
 import org.bukkit.entity.Player;
@@ -20,26 +21,28 @@ import java.util.UUID;
 
 public class WorldListener implements Listener {
     @EventHandler
-    public void onBlockBreak(BlockBreakEvent e) {
-        if (handleBuild(e, e.getBlock(), e.getPlayer()))
+    public void onBlockBreak(final BlockBreakEvent e) {
+        if (handleBuild(e, e.getBlock(), e.getPlayer(), false))
             return;
-
-        if (BuildModeCommand.BUILD_MODE) return;
 
         e.setCancelled(true);
         MessagesUtils.sendMapEditError(e.getPlayer());
     }
 
     @EventHandler
-    public void onBlockPlace(BlockPlaceEvent e) {
-        if (BuildModeCommand.BUILD_MODE) return;
+    public void onBlockPlace(final BlockPlaceEvent e) {
+        if (handleBuild(e, e.getBlock(), e.getPlayer(), true))
+            return;
 
         e.setCancelled(true);
         MessagesUtils.sendMapEditError(e.getPlayer());
     }
 
-    private boolean handleBuild(final Cancellable e, final Block block, final Player p) {
+    private boolean handleBuild(final Cancellable e, final Block block, final Player p, final boolean place) {
         final UUID uuid = p.getUniqueId();
+
+        if (BuildModeCommand.BUILD_MODE)
+            return true;
 
         if (GameManager.state != GameState.STARTED)
             return false;
@@ -52,6 +55,9 @@ public class WorldListener implements Listener {
             return false;
 
         if (!arena.isBuild())
+            return false;
+
+        if (!arena.isPlacedBlock(block) && !place)
             return false;
 
         e.setCancelled(false);

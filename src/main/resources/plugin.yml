@@ -16,4 +16,6 @@ commands:
       - "lobby"
   loc:
     description: Set the location of an arena
-    usage: /loc <1 | 2> <arena>
+    usage: /loc <1 | 2 | 3> <arena>
+  start:
+    description: Start a game

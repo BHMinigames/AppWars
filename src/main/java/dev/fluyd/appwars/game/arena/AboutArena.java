@@ -13,4 +13,6 @@ public @interface AboutArena {
     boolean build() default false;
     boolean allowInteraction() default false;
     boolean allowDropItems() default false;
+    boolean noFall() default true;
+    String subTitle() default "&eBe the last one standing against your opponent!";
 }

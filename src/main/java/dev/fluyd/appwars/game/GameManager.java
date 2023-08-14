@@ -4,18 +4,24 @@ import dev.fluyd.appwars.AppWars;
 import dev.fluyd.appwars.game.arena.Arena;
 import dev.fluyd.appwars.game.arena.impl.Twitter;
 import dev.fluyd.appwars.utils.GameState;
+import dev.fluyd.appwars.utils.config.ConfigUtils;
 import lombok.experimental.UtilityClass;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
+import org.bukkit.World;
+import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.scheduler.BukkitRunnable;
 
+import java.time.Instant;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @UtilityClass
 public final class GameManager {
-    public static final long ROUND_LENGTH = 60L * 20L; // 1 minute rounds
+    public static final long ROUND_LENGTH = 60L;
+    public static final long ROUND_LENGTH_TICKS = ROUND_LENGTH * 20L; // 1 minute rounds
     /**
      * TODO: Just check everything (such as players being online still, still alive, etc at the end of every round and then determine the winner for that arena
      */
@@ -23,6 +29,9 @@ public final class GameManager {
     public GameState state = GameState.WAITING;
     public final List<Arena> arenas = new ArrayList<>();
     public final Map<UUID, Arena> players = new HashMap<>();
+
+    public long startedAt = 0;
+    public long roundStartedAt = 0;
 
     public void initArenas() {
         newArena(new Twitter());
@@ -54,6 +63,9 @@ public final class GameManager {
      * Start the game
      */
     public void start() {
+        GameManager.state = GameState.STARTED;
+        GameManager.startedAt = Instant.now().getEpochSecond();
+
         new BukkitRunnable() {
             @Override
             public void run() {
@@ -68,18 +80,24 @@ public final class GameManager {
                     GameManager.players.clear();
                     GameManager.state = GameState.WAITING;
 
+                    if (ConfigUtils.INSTANCE.lobbyLocation != null)
+                        Bukkit.getOnlinePlayers().forEach(p -> reset(p));
+
+                    GameManager.arenas.forEach(arena -> resetArena(arena));
+
                     super.cancel();
                     return;
                 }
 
                 try {
-                    assignArenas(); // Also starts the arena
+                    GameManager.roundStartedAt = Instant.now().getEpochSecond();
+                    assignArenas(GameManager.players.keySet()); // Also starts the arena
                 } catch (final Exception exception) {
                     exception.printStackTrace();
                     super.cancel();
                 }
             }
-        }.runTaskTimer(AppWars.INSTANCE, 5L, ROUND_LENGTH);
+        }.runTaskTimer(AppWars.INSTANCE, 5L, ROUND_LENGTH_TICKS);
     }
 
     private void checkEveryPlayersSate() {
@@ -97,36 +115,74 @@ public final class GameManager {
                 toEliminate.add(uuid);
         });
 
-        toEliminate.forEach(uuid -> GameManager.players.remove(uuid));
+        toEliminate.forEach(uuid -> {
+            GameManager.players.remove(uuid);
+
+            final Player p = Bukkit.getPlayer(uuid);
+            if (p != null)
+                Bukkit.getOnlinePlayers().forEach(op -> op.sendMessage(ChatColor.RED + String.format("%s was eliminated!", p.getName())));
+        });
     }
 
-    private void assignArenas() throws Exception {
+    private void assignArenas(final Set<UUID> uuids) throws Exception {
         GameManager.players.clear();
         final Iterator<Arena> iterator = arenas.iterator();
 
         int playersAssigned = 0;
-        final Collection<? extends Player> players = Bukkit.getOnlinePlayers();
-        Collections.shuffle((List<?>) players);
+        List<? extends Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
+        if (!uuids.isEmpty())
+            players = new ArrayList<>(uuids.stream().map(uuid -> Bukkit.getPlayer(uuid)).filter(p -> p != null && p.isOnline()).collect(Collectors.toList()));
 
+        Collections.shuffle(players);
+
+        Arena arena = null;
         for (final Player op : players) {
-            Arena arena = null;
             ++playersAssigned;
 
-            if (playersAssigned % 2 == 0) {
+            if (playersAssigned % 2 != 0) {
                 if (!iterator.hasNext())
                     throw new Exception("Not enough arenas to start game.");
 
                 arena = iterator.next();
-                arena.clearPlayers();
+                resetArena(arena);
             }
 
             final UUID uuid = op.getUniqueId();
-            GameManager.players.put(uuid, arena);
 
-            arena.addPlayer(uuid);
+            if (!GameManager.players.containsKey(uuid)) {
+                GameManager.players.put(uuid, arena);
+                arena.addPlayer(uuid);
+            }
         }
 
-        for (final Arena arena : GameManager.players.values())
-            arena.start();
+        for (final Arena a : GameManager.arenas)
+            a.start();
+    }
+
+    private void resetArena(final Arena arena) {
+        arena.removePlacedBlocks();
+        arena.clearPlayers();
+
+        removeDroppedItems(arena.getLoc1().getWorld());
+    }
+
+    private void removeDroppedItems(final World world) {
+        world.getEntities().stream().filter(entity -> entity.getType() == EntityType.DROPPED_ITEM).forEach(entity -> entity.remove());
+    }
+
+    /**
+     * Teleport player to spawn and set their GameMode to survival
+     * @param p
+     */
+    public void reset(final Player p) {
+        if (ConfigUtils.INSTANCE.lobbyLocation != null)
+            p.teleport(ConfigUtils.INSTANCE.lobbyLocation);
+
+        p.getInventory().clear();
+        p.setGameMode(GameMode.SURVIVAL);
+        p.setHealth(p.getMaxHealth());
+
+        if (p.getFlySpeed() <= 0F)
+            p.setFlySpeed(2F);
     }
 }
