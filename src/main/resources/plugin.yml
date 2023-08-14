@@ -1,0 +1,9 @@
+name: AppWars
+version: '${project.version}'
+main: dev.fluyd.appwars.AppWars
+load: STARTUP
+commands:
+  buildmode:
+    description: Toggles build mode.
+  test:
+    description: Execute a test flow.
