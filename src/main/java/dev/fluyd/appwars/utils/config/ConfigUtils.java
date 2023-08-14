@@ -16,12 +16,15 @@ public final class ConfigUtils {
 
     public YamlConfiguration config;
 
+    public int minPlayers;
+    public int maxPlayers;
     public Location lobbyLocation;
 
     public ConfigUtils() {
         this.configFile = new File(AppWars.INSTANCE.getDataFolder(), "config.yml");
 
         this.setValues();
+        this.defaults();
     }
 
     private void setValues() {
@@ -33,7 +36,21 @@ public final class ConfigUtils {
         /**
          * Config values
          */
+        this.minPlayers = this.config.getInt(ConfigType.MIN_PLAYERS.getName());
+        this.maxPlayers = this.config.getInt(ConfigType.MAX_PLAYERS.getName());
         this.lobbyLocation = (Location) this.config.get(ConfigType.LOBBY_LOCATION.getName());
+    }
+
+    private void defaults() {
+        for (final ConfigType type : ConfigType.values()) {
+            final String name = type.getName();
+            final Object value = type.getDefaultValue();
+
+            if (value != null && !config.getKeys(false).contains(name))
+                config.set(name, value);
+        }
+
+        this.save();
     }
 
     public void save() {

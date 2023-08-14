@@ -19,6 +19,10 @@ public class MessagesUtils {
         sender.sendMessage(ChatColor.RED + "You must be a player to perform this command.");
     }
 
+    public void sendCannotDoThisAtThisTime(Player p) {
+        p.sendMessage(ChatColor.GREEN + "You cannot do this at this time!");
+    }
+
     public void sendOutOfBoundsError(Player p) {
         p.sendMessage(ChatColor.RED + "You can not go there!");
     }

@@ -24,7 +24,8 @@ public final class SetSpawn implements CommandExecutor {
             return false;
         }
 
-        this.center(p);
+        center(p);
+        fixRotation(p);
 
         final Location loc = p.getLocation();
         ConfigType.LOBBY_LOCATION.set(loc);
@@ -33,10 +34,18 @@ public final class SetSpawn implements CommandExecutor {
         return true;
     }
 
-    private void center(final Player p) {
+    public static void center(final Player p) {
         final Location loc = p.getLocation();
-        final Location center = new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getBlockY(), loc.getBlockZ() + 0.5, 180, 0);
+        final Location center = new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getBlockY() + 0.5, loc.getBlockZ() + 0.5, loc.getYaw(), loc.getPitch());
 
         p.teleport(center);
+    }
+
+    private static void fixRotation(final Player p) {
+        final Location loc = p.getLocation();
+        loc.setYaw(180);
+        loc.setPitch(0);
+
+        p.teleport(loc);
     }
 }

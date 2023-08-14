@@ -1,5 +1,7 @@
 package dev.fluyd.appwars.commands;
 
+import dev.fluyd.appwars.game.GameManager;
+import dev.fluyd.appwars.utils.GameState;
 import dev.fluyd.appwars.utils.MessagesUtils;
 import dev.fluyd.appwars.utils.config.ConfigUtils;
 import org.bukkit.ChatColor;
@@ -20,6 +22,11 @@ public final class Spawn implements CommandExecutor {
 
         if (ConfigUtils.INSTANCE.lobbyLocation == null) {
             p.sendMessage(ChatColor.RED + "No spawn set.");
+            return true;
+        }
+
+        if (GameManager.state == GameState.STARTED) {
+            MessagesUtils.sendCannotDoThisAtThisTime(p);
             return true;
         }
 
