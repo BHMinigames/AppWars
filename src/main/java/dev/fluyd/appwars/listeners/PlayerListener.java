@@ -41,13 +41,16 @@ public class PlayerListener implements Listener {
         }
 
         final UUID uuid = p.getUniqueId();
-        if (GameManager.state == GameState.STARTED && GameManager.players.containsKey(uuid)) { // Prevent things like players leaving in one round and joining back later and still be in the previous place
+        if (GameManager.state == GameState.STARTED && !GameManager.players.containsKey(uuid)) { // Prevent things like players leaving in one round and joining back later and still be in the previous place
             e.setJoinMessage(null);
             p.kickPlayer(ChatColor.RED + "This game has already started.");
             return;
         }
 
-        e.setJoinMessage(ChatColor.translateAlternateColorCodes('&', String.format("&7(&b%s&7/&b%s&7)&e %s joined.", players, maxPlayers, p.getName())));
+        if (GameManager.state == GameState.STARTED)
+            e.setJoinMessage(ChatColor.translateAlternateColorCodes('&', String.format("&e%s joined back.", p.getName())));
+        else
+            e.setJoinMessage(ChatColor.translateAlternateColorCodes('&', String.format("&7(&b%s&7/&b%s&7)&e %s joined.", players, maxPlayers, p.getName())));
         new ScoreboardHandler(p, "§eAPP WARS");
 
         if (ConfigUtils.INSTANCE.lobbyLocation != null && GameManager.state != GameState.STARTED)
@@ -160,17 +163,14 @@ public class PlayerListener implements Listener {
         p.sendTitle(ChatColor.translateAlternateColorCodes('&', title), ChatColor.translateAlternateColorCodes('&', subTitle));
     }
 
-    private void dropAndClearInventory(Player player, Location dropLocation) {
-        PlayerInventory inventory = player.getInventory(); // Player's inventory
+    private void dropAndClearInventory(final Player player, final Location dropLocation) {
+        final PlayerInventory inventory = player.getInventory();
 
-        // Loop through items and drop them
-        for (ItemStack item : inventory.getContents()) {
-            if (item != null && item.getType() != Material.AIR) { // Make sure the item slot isn't empty
+        for (final ItemStack item : inventory.getContents()) {
+            if (item != null && item.getType() != Material.AIR)
                 player.getWorld().dropItemNaturally(dropLocation, item);
-            }
         }
 
-        // Clear the inventory
-        inventory.clear();
+        GameManager.clearInv(player);
     }
 }

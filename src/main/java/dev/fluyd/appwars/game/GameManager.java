@@ -12,6 +12,7 @@ import org.bukkit.GameMode;
 import org.bukkit.World;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
+import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
 
 import java.time.Instant;
@@ -41,6 +42,7 @@ public final class GameManager {
 
     public void disable() {
         arenas.forEach(Arena::removePlacedBlocks);
+        Bukkit.getOnlinePlayers().forEach(p -> p.kickPlayer(ChatColor.RED + "Game restarting")); // To prevent bugs on reload
     }
 
     /**
@@ -198,11 +200,26 @@ public final class GameManager {
         if (ConfigUtils.INSTANCE.lobbyLocation != null)
             p.teleport(ConfigUtils.INSTANCE.lobbyLocation);
 
-        p.getInventory().clear();
+        clearInv(p);
+
         p.setGameMode(GameMode.SURVIVAL);
         p.setHealth(p.getMaxHealth());
 
         if (p.getFlySpeed() <= 0F)
             p.setFlySpeed(2F);
+    }
+
+    /**
+     * Clears the players inventory
+     * @param p
+     */
+    public void clearInv(final Player p) {
+        final PlayerInventory inv = p.getInventory();
+
+        inv.clear();
+        inv.setHelmet(null);
+        inv.setChestplate(null);
+        inv.setLeggings(null);
+        inv.setBoots(null);
     }
 }
