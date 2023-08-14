@@ -19,6 +19,7 @@ public final class ConfigUtils {
     public int minPlayers;
     public int maxPlayers;
     public Location lobbyLocation;
+    public int roundLength;
 
     public ConfigUtils() {
         this.configFile = new File(AppWars.INSTANCE.getDataFolder(), "config.yml");
@@ -39,6 +40,7 @@ public final class ConfigUtils {
         this.minPlayers = this.config.getInt(ConfigType.MIN_PLAYERS.getName());
         this.maxPlayers = this.config.getInt(ConfigType.MAX_PLAYERS.getName());
         this.lobbyLocation = (Location) this.config.get(ConfigType.LOBBY_LOCATION.getName());
+        this.roundLength = this.config.getInt(ConfigType.ROUND_LENGTH.getName());
     }
 
     private void defaults() {

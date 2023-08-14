@@ -6,7 +6,8 @@ import lombok.Getter;
 public enum ConfigType {
     MIN_PLAYERS(6),
     MAX_PLAYERS(12),
-    LOBBY_LOCATION;
+    LOBBY_LOCATION,
+    ROUND_LENGTH(60);
 
     private final String name = pretty(this.name());
     private final Object defaultValue;

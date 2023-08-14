@@ -135,7 +135,7 @@ public abstract class Arena {
     }
 
     protected void sendTitle() {
-        this.getPlayers().forEach(p -> p.sendTitle(ChatColor.translateAlternateColorCodes('&', String.format("&a&l%s", this.getName())), ChatColor.translateAlternateColorCodes('&', this.getSubTitle())));
+        this.getPlayers().stream().filter(p -> p != null && p.isOnline()).forEach(p -> p.sendTitle(ChatColor.translateAlternateColorCodes('&', String.format("&a&l%s", this.getName())), ChatColor.translateAlternateColorCodes('&', this.getSubTitle())));
     }
 
     /**
@@ -143,11 +143,8 @@ public abstract class Arena {
      * @param seconds
      * @return
      */
-    private boolean startedLongerThan(final long seconds) {
-        final long now = Instant.now().getEpochSecond();
-        final long diff = now - GameManager.startedAt;
-
-        return diff > seconds;
+    protected boolean startedLongerThan(final long seconds) {
+        return GameManager.startedLongerThan(seconds);
     }
 
     /**

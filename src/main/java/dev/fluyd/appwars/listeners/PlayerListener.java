@@ -40,6 +40,13 @@ public class PlayerListener implements Listener {
             return;
         }
 
+        final UUID uuid = p.getUniqueId();
+        if (GameManager.state == GameState.STARTED && GameManager.players.containsKey(uuid)) { // Prevent things like players leaving in one round and joining back later and still be in the previous place
+            e.setJoinMessage(null);
+            p.kickPlayer(ChatColor.RED + "This game has already started.");
+            return;
+        }
+
         e.setJoinMessage(ChatColor.translateAlternateColorCodes('&', String.format("&7(&b%s&7/&b%s&7)&e %s joined.", players, maxPlayers, p.getName())));
         new ScoreboardHandler(p, "§eAPP WARS");
 

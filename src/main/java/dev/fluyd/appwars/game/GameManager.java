@@ -20,11 +20,8 @@ import java.util.stream.Collectors;
 
 @UtilityClass
 public final class GameManager {
-    public static final long ROUND_LENGTH = 60L;
-    public static final long ROUND_LENGTH_TICKS = ROUND_LENGTH * 20L; // 1 minute rounds
-    /**
-     * TODO: Just check everything (such as players being online still, still alive, etc at the end of every round and then determine the winner for that arena
-     */
+    public static long roundLength;
+    public static long roundLengthTicks;
 
     public GameState state = GameState.WAITING;
     public final List<Arena> arenas = new ArrayList<>();
@@ -74,17 +71,18 @@ public final class GameManager {
                 if (GameManager.players.size() == 1) { // A player won the game
                     GameManager.players.keySet().forEach(uuid -> {
                         final Player p = Bukkit.getPlayer(uuid);
-                        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', String.format("&a&l%s won the game!", p.getName())));
+                        Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', String.format("&a%s won the game!", p.getName())));
                     });
 
-                    GameManager.players.clear();
-                    GameManager.state = GameState.WAITING;
+                    resetGame();
+                    super.cancel();
 
-                    if (ConfigUtils.INSTANCE.lobbyLocation != null)
-                        Bukkit.getOnlinePlayers().forEach(p -> reset(p));
+                    return;
+                }
 
-                    GameManager.arenas.forEach(arena -> resetArena(arena));
-
+                if (GameManager.startedLongerThan(10) && GameManager.players.isEmpty()) {
+                    Bukkit.broadcastMessage(ChatColor.translateAlternateColorCodes('&', "&bGame was cancelled, everyone left."));
+                    resetGame();
                     super.cancel();
                     return;
                 }
@@ -97,7 +95,29 @@ public final class GameManager {
                     super.cancel();
                 }
             }
-        }.runTaskTimer(AppWars.INSTANCE, 5L, ROUND_LENGTH_TICKS);
+        }.runTaskTimer(AppWars.INSTANCE, 5L, roundLengthTicks);
+    }
+
+    private void resetGame() {
+        GameManager.players.clear();
+        GameManager.state = GameState.WAITING;
+
+        if (ConfigUtils.INSTANCE.lobbyLocation != null)
+            Bukkit.getOnlinePlayers().forEach(p -> reset(p));
+
+        GameManager.arenas.forEach(arena -> resetArena(arena));
+    }
+
+    /**
+     * Check if the game started longer than x amount of seconds ago
+     * @param seconds
+     * @return
+     */
+    public boolean startedLongerThan(final long seconds) {
+        final long now = Instant.now().getEpochSecond();
+        final long diff = now - GameManager.startedAt;
+
+        return diff > seconds;
     }
 
     private void checkEveryPlayersSate() {

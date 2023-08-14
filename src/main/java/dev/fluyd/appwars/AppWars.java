@@ -7,6 +7,7 @@ import dev.fluyd.appwars.listeners.KillTrackerListener;
 import dev.fluyd.appwars.listeners.PlayerListener;
 import dev.fluyd.appwars.listeners.WorldListener;
 //import dev.fluyd.spigotcore.CoreProvider;
+import dev.fluyd.appwars.utils.config.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -30,6 +31,9 @@ public final class AppWars extends JavaPlugin {
             registerListeners();
             registerCommands();
             registerTabCompleters();
+
+            GameManager.roundLength = ConfigUtils.INSTANCE.roundLength;
+            GameManager.roundLengthTicks = GameManager.roundLength * 20L;
         };
     }
 

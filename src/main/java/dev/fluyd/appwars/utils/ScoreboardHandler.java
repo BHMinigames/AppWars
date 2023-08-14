@@ -41,7 +41,7 @@ public final class ScoreboardHandler {
 
         final long now = Instant.now().getEpochSecond();
         final long diff = now - GameManager.roundStartedAt;
-        final long timeLeft = GameManager.ROUND_LENGTH - diff;
+        final long timeLeft = GameManager.roundLength - diff;
 
         final Arena arena = GameManager.players.get(this.p.getUniqueId());
 
