@@ -24,10 +24,19 @@ public final class SetSpawn implements CommandExecutor {
             return false;
         }
 
+        this.center(p);
+
         final Location loc = p.getLocation();
         ConfigType.LOBBY_LOCATION.set(loc);
 
         p.sendMessage(ChatColor.GREEN + "Spawn location has been set!");
         return true;
+    }
+
+    private void center(final Player p) {
+        final Location loc = p.getLocation();
+        final Location center = new Location(loc.getWorld(), loc.getBlockX() + 0.5, loc.getBlockY(), loc.getBlockZ() + 0.5, 180, 0);
+
+        p.teleport(center);
     }
 }

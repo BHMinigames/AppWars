@@ -17,6 +17,12 @@ public final class Spawn implements CommandExecutor {
         }
 
         final Player p = (Player) sender;
+
+        if (ConfigUtils.INSTANCE.lobbyLocation == null) {
+            p.sendMessage(ChatColor.RED + "No spawn set.");
+            return true;
+        }
+
         p.teleport(ConfigUtils.INSTANCE.lobbyLocation);
         p.sendMessage(ChatColor.GREEN + "Teleported to spawn.");
         return true;

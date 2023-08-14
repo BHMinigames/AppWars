@@ -14,15 +14,14 @@ public final class ConfigUtils {
     public static final ConfigUtils INSTANCE = new ConfigUtils();
 
     private final File configFile;
-    public final YamlConfiguration config;
-    private final ConfigurationSection settings;
+
+    public YamlConfiguration config;
+    private ConfigurationSection settings;
 
     public Location lobbyLocation;
 
     public ConfigUtils() {
-        configFile = new File(AppWars.INSTANCE.getDataFolder(), "config.yml");
-        config = getConfig();
-        settings = config != null ? config.getConfigurationSection("settings") : null;
+        this.configFile = new File(AppWars.INSTANCE.getDataFolder(), "config.yml");
 
         if (settings == null)
             return;
@@ -31,7 +30,16 @@ public final class ConfigUtils {
     }
 
     private void setValues() {
-        this.lobbyLocation = (Location) settings.get(ConfigType.LOBBY_LOCATION.getName());
+        this.config = this.getConfig();
+        this.settings = this.config != null ? this.config.getConfigurationSection("settings") : null;
+
+        /**
+         * Config values
+         */
+        if (this.settings == null)
+            return;
+
+        this.lobbyLocation = (Location) this.settings.get(ConfigType.LOBBY_LOCATION.getName());
     }
 
     public void save() {
