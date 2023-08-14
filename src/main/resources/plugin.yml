@@ -7,3 +7,10 @@ commands:
     description: Toggles build mode.
   test:
     description: Execute a test flow.
+  setspawn:
+    description: Set the spawn location
+  spawn:
+    description: Teleport to the spawn point
+    aliases:
+      - "hub"
+      - "lobby"

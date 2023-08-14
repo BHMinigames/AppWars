@@ -1,4 +1,4 @@
-package dev.fluyd.appwars.utils;
+package dev.fluyd.appwars.utils.config;
 
 import dev.fluyd.appwars.AppWars;
 import org.apache.commons.io.FileUtils;
@@ -11,6 +11,8 @@ import java.io.IOException;
 import java.io.InputStream;
 
 public final class ConfigUtils {
+    public static final ConfigUtils INSTANCE = new ConfigUtils();
+
     private final File configFile;
     public final YamlConfiguration config;
     private final ConfigurationSection settings;
@@ -24,10 +26,12 @@ public final class ConfigUtils {
 
         if (settings == null)
             return;
+
+        this.setValues();
     }
 
     private void setValues() {
-        this.lobbyLocation = (Location) settings.get("lobby-location");
+        this.lobbyLocation = (Location) settings.get(ConfigType.LOBBY_LOCATION.getName());
     }
 
     public void save() {
