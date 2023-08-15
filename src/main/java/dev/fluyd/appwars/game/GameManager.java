@@ -255,7 +255,7 @@ public final class GameManager {
         p.setHealth(p.getMaxHealth());
 
         if (ConfigUtils.INSTANCE.lobbyLocation != null)
-            p.teleport(ConfigUtils.INSTANCE.lobbyLocation.add(0, 1, 0));
+            p.teleport(ConfigUtils.INSTANCE.lobbyLocation.clone().add(0, 1, 0));
 
         if (p.getFlySpeed() <= 0F)
             p.setFlySpeed(2F);

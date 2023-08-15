@@ -30,7 +30,7 @@ public final class Spawn implements CommandExecutor {
             return true;
         }
 
-        p.teleport(ConfigUtils.INSTANCE.lobbyLocation.add(0, 1, 0));
+        p.teleport(ConfigUtils.INSTANCE.lobbyLocation.clone().add(0, 1, 0));
         p.sendMessage(ChatColor.GREEN + "Teleported to spawn.");
         return true;
     }
