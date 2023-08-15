@@ -2,6 +2,7 @@ name: AppWars
 version: '${project.version}'
 main: dev.fluyd.appwars.AppWars
 load: STARTUP
+depend: [Citizens]
 commands:
   buildmode:
     description: Toggles build mode.

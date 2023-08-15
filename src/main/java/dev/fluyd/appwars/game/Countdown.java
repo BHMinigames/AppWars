@@ -11,7 +11,7 @@ import org.bukkit.scheduler.BukkitTask;
 import java.util.function.Consumer;
 
 /**
- * Thanks fluyd
+ * Thanks Fluyd
  */
 public final class Countdown {
     private int countdownTime;

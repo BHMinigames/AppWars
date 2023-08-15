@@ -6,7 +6,6 @@ import dev.fluyd.appwars.listeners.InitListeners;
 import dev.fluyd.appwars.listeners.KillTrackerListener;
 import dev.fluyd.appwars.listeners.PlayerListener;
 import dev.fluyd.appwars.listeners.WorldListener;
-//import dev.fluyd.spigotcore.CoreProvider;
 import dev.fluyd.appwars.utils.config.ConfigUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.event.Listener;

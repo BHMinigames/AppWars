@@ -4,6 +4,7 @@ import dev.fluyd.appwars.game.Countdown;
 import dev.fluyd.appwars.game.GameManager;
 import dev.fluyd.appwars.game.arena.Arena;
 import dev.fluyd.appwars.listeners.custom.PlayerKillEvent;
+import dev.fluyd.appwars.mirror.Mirror;
 import dev.fluyd.appwars.utils.GameState;
 import dev.fluyd.appwars.utils.ScoreboardHandler;
 import dev.fluyd.appwars.utils.config.ConfigUtils;
@@ -16,9 +17,9 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.player.PlayerDropItemEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
-import org.bukkit.event.player.PlayerJoinEvent;
+import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.player.*;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -33,6 +34,11 @@ public class PlayerListener implements Listener {
         final int maxPlayers = ConfigUtils.INSTANCE.maxPlayers;
 
         final Player p = e.getPlayer();
+
+        // REMOVE AFTER TESTING
+        if (!GameManager.playerMirrors.containsKey(p))
+            GameManager.playerMirrors.put(p, new Mirror(p));
+        // REMOVE AFTER TESTING
 
         if (players >= maxPlayers) {
             e.setJoinMessage(null);
@@ -65,7 +71,6 @@ public class PlayerListener implements Listener {
     @EventHandler
     public void onFoodLevelChange(final FoodLevelChangeEvent e) {
         e.setFoodLevel(20);
-//        e.setCancelled(true);
     }
 
     @EventHandler
@@ -124,6 +129,11 @@ public class PlayerListener implements Listener {
     public void onPlayerInteract(final PlayerInteractEvent e) {
         final Player p = e.getPlayer();
         final UUID uuid = p.getUniqueId();
+        Mirror playerMirror = GameManager.playerMirrors.get(e.getPlayer());
+
+        if (playerMirror != null && e.getAction().toString().contains("LEFT"))
+            playerMirror.makeNpcSwingArm();
+
 
         if (!GameManager.players.containsKey(uuid))
             return;
@@ -157,6 +167,62 @@ public class PlayerListener implements Listener {
 
         final Player killer = e.getKiller();
         this.sendTitle(killer, "&a&lVictory", "&eYou won!");
+    }
+
+    @EventHandler
+    public void onPlayerMove(PlayerMoveEvent e) {
+        Mirror playerMirror = GameManager.playerMirrors.get(e.getPlayer());
+
+        if (playerMirror != null)
+            playerMirror.handleReflect();
+
+        if (!GameManager.playerMirrors.containsKey(e.getPlayer()) && playerMirror == null && Mirror.isInMirrorBox(e.getPlayer()))
+            GameManager.playerMirrors.put(e.getPlayer(), new Mirror(e.getPlayer()));
+
+        if (GameManager.playerMirrors.containsKey(e.getPlayer()) && playerMirror != null && !playerMirror.isInMirrorBox() && playerMirror.npc != null)
+            playerMirror.deleteNPC();
+    }
+
+    @EventHandler
+    public void onPlayerToggleSneak(PlayerToggleSneakEvent e) {
+        Mirror playerMirror = GameManager.playerMirrors.get(e.getPlayer());
+
+        if (playerMirror != null) {
+            playerMirror.setNpcSneaking(e.isSneaking());
+        }
+    }
+
+    @EventHandler
+    public void onItemChange(PlayerItemHeldEvent e) {
+        Player player = e.getPlayer();
+        ItemStack newItem = player.getInventory().getItem(e.getNewSlot());
+
+        Mirror playerMirror = GameManager.playerMirrors.get(e.getPlayer());
+
+        if (playerMirror != null && playerMirror.npc != null)
+            playerMirror.copyItemToNPC(newItem);
+    }
+
+    @EventHandler
+    public void onInventoryPickupItem(InventoryPickupItemEvent e) {
+        Player player = (Player) e.getInventory().getHolder();
+        ItemStack newItem = player.getItemInHand();
+
+        Mirror playerMirror = GameManager.playerMirrors.get(player);
+
+        if (playerMirror != null && playerMirror.npc != null)
+            playerMirror.copyItemToNPC(newItem);
+    }
+
+    @EventHandler
+    public void onInventoryClick(InventoryClickEvent e) {
+        Player player = (Player) e.getInventory().getHolder();
+        ItemStack newItem = player.getItemInHand();
+
+        Mirror playerMirror = GameManager.playerMirrors.get(player);
+
+        if (playerMirror != null && playerMirror.npc != null)
+            playerMirror.copyItemToNPC(newItem);
     }
 
     private void sendTitle(final Player p, final String title, final String subTitle) {

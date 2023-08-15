@@ -2,7 +2,9 @@ package dev.fluyd.appwars.testflow.flows;
 
 import dev.fluyd.appwars.AppWars;
 import dev.fluyd.appwars.testflow.TestFlow;
-import org.bukkit.*;
+import org.bukkit.GameMode;
+import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;

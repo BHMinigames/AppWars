@@ -8,6 +8,7 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockState;
 import org.bukkit.entity.Player;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
@@ -15,9 +16,8 @@ import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.lang.annotation.Annotation;
-import java.time.Instant;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
 import java.util.UUID;
 
@@ -35,7 +35,7 @@ public abstract class Arena {
     private final boolean noFall;
     private final String subTitle;
 
-    private final @Getter(AccessLevel.PROTECTED) List<Location> placedBlocks = new ArrayList<>();
+    private final @Getter(AccessLevel.PROTECTED) HashMap<Location, BlockState> placedBlocks = new HashMap<>();
 
     private Location loc1;
     private Location loc2;
@@ -80,19 +80,23 @@ public abstract class Arena {
         this.setLocations();
     }
 
-    public void addPlacedBlock(final Block block) {
-        this.placedBlocks.add(block.getLocation());
+    public void addPlacedBlock(final Block block, final BlockState replacedBlock) {
+        this.placedBlocks.put(block.getLocation(), replacedBlock);
     }
 
     public boolean isPlacedBlock(final Block block) {
-        return this.placedBlocks.contains(block.getLocation());
+        return this.placedBlocks.containsKey(block.getLocation());
     }
 
     public void removePlacedBlocks() {
         if (!this.build)
             return;
 
-        this.placedBlocks.forEach(block -> block.getBlock().setType(Material.AIR));
+        this.placedBlocks.forEach((block, replacedBlock) -> {
+            if (replacedBlock == null) return;
+            block.getBlock().setType(replacedBlock.getType());
+            block.getBlock().setData(replacedBlock.getRawData());
+        });
         this.placedBlocks.clear();
     }
 
@@ -121,7 +125,7 @@ public abstract class Arena {
     }
 
     /**
-     * TODO: Change this method to do the slow teleport where it pushes you into the app
+     * TODO: Change this method to do the slow teleport where it pushes you into the app (Fluyd from the future, hellins brain had a buffer overflow, this is nonsense data)
      */
     protected void teleport() {
         final Player p1 = this.getPlayer1();

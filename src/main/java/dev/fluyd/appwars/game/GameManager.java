@@ -3,6 +3,7 @@ package dev.fluyd.appwars.game;
 import dev.fluyd.appwars.AppWars;
 import dev.fluyd.appwars.game.arena.Arena;
 import dev.fluyd.appwars.game.arena.impl.Twitter;
+import dev.fluyd.appwars.mirror.Mirror;
 import dev.fluyd.appwars.utils.GameState;
 import dev.fluyd.appwars.utils.config.ConfigUtils;
 import lombok.experimental.UtilityClass;
@@ -10,6 +11,7 @@ import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.GameMode;
 import org.bukkit.World;
+import org.bukkit.entity.Entity;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
@@ -27,6 +29,7 @@ public final class GameManager {
     public GameState state = GameState.WAITING;
     public final List<Arena> arenas = new ArrayList<>();
     public final Map<UUID, Arena> players = new HashMap<>();
+    public final Map<Player, Mirror> playerMirrors = new HashMap<>();
 
     public long startedAt = 0;
     public long roundStartedAt = 0;
@@ -105,9 +108,9 @@ public final class GameManager {
         GameManager.state = GameState.WAITING;
 
         if (ConfigUtils.INSTANCE.lobbyLocation != null)
-            Bukkit.getOnlinePlayers().forEach(p -> reset(p));
+            Bukkit.getOnlinePlayers().forEach(GameManager::reset);
 
-        GameManager.arenas.forEach(arena -> resetArena(arena));
+        GameManager.arenas.forEach(GameManager::resetArena);
     }
 
     /**
@@ -153,7 +156,7 @@ public final class GameManager {
         int playersAssigned = 0;
         List<? extends Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
         if (!uuids.isEmpty())
-            players = new ArrayList<>(uuids.stream().map(uuid -> Bukkit.getPlayer(uuid)).filter(p -> p != null && p.isOnline()).collect(Collectors.toList()));
+            players = new ArrayList<>(uuids.stream().map(Bukkit::getPlayer).filter(p -> p != null && p.isOnline()).collect(Collectors.toList()));
 
         Collections.shuffle(players);
 
@@ -175,6 +178,9 @@ public final class GameManager {
                 GameManager.players.put(uuid, arena);
                 arena.addPlayer(uuid);
             }
+
+            if (!GameManager.playerMirrors.containsKey(op))
+                GameManager.playerMirrors.put(op, new Mirror(op));
         }
 
         for (final Arena a : GameManager.arenas)
@@ -189,7 +195,7 @@ public final class GameManager {
     }
 
     private void removeDroppedItems(final World world) {
-        world.getEntities().stream().filter(entity -> entity.getType() == EntityType.DROPPED_ITEM).forEach(entity -> entity.remove());
+        world.getEntities().stream().filter(entity -> entity.getType() == EntityType.DROPPED_ITEM).forEach(Entity::remove);
     }
 
     /**
@@ -197,13 +203,13 @@ public final class GameManager {
      * @param p
      */
     public void reset(final Player p) {
-        if (ConfigUtils.INSTANCE.lobbyLocation != null)
-            p.teleport(ConfigUtils.INSTANCE.lobbyLocation);
-
         clearInv(p);
 
         p.setGameMode(GameMode.SURVIVAL);
         p.setHealth(p.getMaxHealth());
+
+        if (ConfigUtils.INSTANCE.lobbyLocation != null)
+            p.teleport(ConfigUtils.INSTANCE.lobbyLocation.add(0, 1, 0));
 
         if (p.getFlySpeed() <= 0F)
             p.setFlySpeed(2F);
