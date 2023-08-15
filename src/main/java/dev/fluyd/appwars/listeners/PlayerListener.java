@@ -14,6 +14,7 @@ import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.Action;
+import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
@@ -124,6 +125,26 @@ public class PlayerListener implements Listener {
             if (arena != null && !arena.isPvp())
                 e.setCancelled(true);
         }
+    }
+
+    @EventHandler
+    public void onEntityDamageByEntity(final EntityDamageByEntityEvent e) {
+        final Entity entity = e.getEntity();
+        final Entity damager = e.getDamager();
+
+        if (!(entity instanceof Player) || !(damager instanceof Player))
+            return;
+
+        final Player hitter = (Player) damager;
+        final UUID uuid = hitter.getUniqueId();
+
+        if (!GameManager.players.containsKey(uuid))
+            return;
+
+        final Arena arena = GameManager.players.get(uuid);
+
+        if (arena != null && !arena.isPvp())
+            e.setCancelled(true);
     }
 
     @EventHandler
