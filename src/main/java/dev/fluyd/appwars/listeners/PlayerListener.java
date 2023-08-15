@@ -18,9 +18,10 @@ import org.bukkit.event.entity.EntityDamageByEntityEvent;
 import org.bukkit.event.entity.EntityDamageEvent;
 import org.bukkit.event.entity.FoodLevelChangeEvent;
 import org.bukkit.event.entity.PlayerDeathEvent;
-import org.bukkit.event.inventory.InventoryClickEvent;
-import org.bukkit.event.inventory.InventoryPickupItemEvent;
+import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.*;
+import org.bukkit.inventory.CraftingInventory;
+import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.PlayerInventory;
 
@@ -73,6 +74,11 @@ public class PlayerListener implements Listener {
     public void onPlayerQuit(final PlayerQuitEvent e) {
         final Player p = e.getPlayer();
         final UUID uuid = p.getUniqueId();
+
+        Mirror playerMirror = GameManager.playerMirrors.get(e.getPlayer());
+
+        if (playerMirror != null)
+            playerMirror.deleteNPC();
 
         if (GameManager.state == GameState.STARTED && !GameManager.players.containsKey(uuid))
             e.setQuitMessage(null);
@@ -161,6 +167,26 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onClickInventory(final InventoryClickEvent e) {
+        if (e.getSlotType() == InventoryType.SlotType.CRAFTING)
+            e.setCancelled(true);
+    }
+
+    @EventHandler
+    public void onInventoryDrag(final InventoryDragEvent e) {
+//        e.getRawSlots().forEach(System.out::println);
+
+        if (e.getInventory() instanceof CraftingInventory) {
+            for (int slot : e.getRawSlots()) {
+                if (slot > 0 && slot < 5) {
+                    e.setCancelled(true);
+                    return;
+                }
+            }
+        }
+    }
+
+    @EventHandler
     public void onPlayerInteract(final PlayerInteractEvent e) {
         final Player p = e.getPlayer();
         final UUID uuid = p.getUniqueId();
@@ -227,38 +253,38 @@ public class PlayerListener implements Listener {
         }
     }
 
-    @EventHandler
-    public void onItemChange(PlayerItemHeldEvent e) {
-        Player player = e.getPlayer();
-        ItemStack newItem = player.getInventory().getItem(e.getNewSlot());
-
-        Mirror playerMirror = GameManager.playerMirrors.get(e.getPlayer());
-
-        if (playerMirror != null && playerMirror.npc != null)
-            playerMirror.copyItemToNPC(newItem);
-    }
-
-    @EventHandler
-    public void onInventoryPickupItem(InventoryPickupItemEvent e) {
-        Player player = (Player) e.getInventory().getHolder();
-        ItemStack newItem = player.getItemInHand();
-
-        Mirror playerMirror = GameManager.playerMirrors.get(player);
-
-        if (playerMirror != null && playerMirror.npc != null)
-            playerMirror.copyItemToNPC(newItem);
-    }
-
-    @EventHandler
-    public void onInventoryClick(InventoryClickEvent e) {
-        Player player = (Player) e.getInventory().getHolder();
-        ItemStack newItem = player.getItemInHand();
-
-        Mirror playerMirror = GameManager.playerMirrors.get(player);
-
-        if (playerMirror != null && playerMirror.npc != null)
-            playerMirror.copyItemToNPC(newItem);
-    }
+//    @EventHandler
+//    public void onItemChange(PlayerItemHeldEvent e) {
+//        Player player = e.getPlayer();
+//        ItemStack newItem = player.getInventory().getItem(e.getNewSlot());
+//
+//        Mirror playerMirror = GameManager.playerMirrors.get(e.getPlayer());
+//
+//        if (playerMirror != null && playerMirror.npc != null)
+//            playerMirror.copyItemToNPC(newItem);
+//    }
+//
+//    @EventHandler
+//    public void onInventoryPickupItem(InventoryPickupItemEvent e) {
+//        Player player = (Player) e.getInventory().getHolder();
+//        ItemStack newItem = player.getItemInHand();
+//
+//        Mirror playerMirror = GameManager.playerMirrors.get(player);
+//
+//        if (playerMirror != null && playerMirror.npc != null)
+//            playerMirror.copyItemToNPC(newItem);
+//    }
+//
+//    @EventHandler
+//    public void onInventoryClick(InventoryClickEvent e) {
+//        Player player = (Player) e.getInventory().getHolder();
+//        ItemStack newItem = player.getItemInHand();
+//
+//        Mirror playerMirror = GameManager.playerMirrors.get(player);
+//
+//        if (playerMirror != null && playerMirror.npc != null)
+//            playerMirror.copyItemToNPC(newItem);
+//    }
 
     private void dropAndClearInventory(final Player player, final Location dropLocation) {
         final PlayerInventory inventory = player.getInventory();

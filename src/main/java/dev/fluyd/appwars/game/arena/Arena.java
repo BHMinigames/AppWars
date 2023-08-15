@@ -35,6 +35,7 @@ public abstract class Arena {
     private final boolean dropItems;
     private final boolean noFall;
     private final String subTitle;
+    private final boolean available;
 
     private final @Getter(AccessLevel.PROTECTED) HashMap<Location, BlockState> placedBlocks = new HashMap<>();
 
@@ -46,6 +47,7 @@ public abstract class Arena {
     private UUID uuid2;
 
     private @Getter(AccessLevel.PROTECTED) Map<Integer, AddButton.Button> buttons = new HashMap<>();
+    private @Getter(AccessLevel.PROTECTED) Map<Integer, MagicFloor> magicFloors = new HashMap<>();
 
     public Arena() {
         final Annotation annotation = this.getClass().getAnnotation(AboutArena.class);
@@ -58,9 +60,11 @@ public abstract class Arena {
         this.dropItems = about.allowDropItems();
         this.noFall = about.noFall();
         this.subTitle = about.subTitle();
+        this.available = about.available();
 
         this.setLocations();
         this.setButtons();
+        this.setMagicFloors();
     }
 
     /**
@@ -143,12 +147,25 @@ public abstract class Arena {
     }
 
     /**
-     * Add a button location for this arena
+     * Add a button location to this arena
      * @param button
      */
     public void addButton(final AddButton.Button button) {
         final int nextId = this.buttons.size();
         this.buttons.put(nextId, button);
+    }
+
+    /**
+     * Checks if this arena already has specified button
+     * @param button
+     * @return
+     */
+    public boolean hasButton(final AddButton.Button button) {
+        for (final AddButton.Button b : this.buttons.values())
+            if (b.equals(button))
+                return true;
+
+        return false;
     }
 
     /**
@@ -166,6 +183,51 @@ public abstract class Arena {
         this.buttons.forEach((id, button) -> {
             finalSection.set(String.format("%s.place-on", id), button.getPlaceOn());
             finalSection.set(String.format("%s.block-face", id), button.getFace().name());
+        });
+
+        ConfigUtils.INSTANCE.save();
+        this.setButtons();
+    }
+
+    private void setMagicFloors() {
+        final ConfigurationSection section = ConfigUtils.INSTANCE.config.getConfigurationSection(String.format("%s.magic-floors", this.name));
+
+        if (section == null)
+            return;
+
+        section.getKeys(false).forEach(id -> {
+            final Location loc1 = (Location) section.get(String.format("%s.loc-1", id));
+            final Location loc2 = (Location) section.get(String.format("%s.loc-2", id));
+
+            final MagicFloor magicFloor = new MagicFloor(loc1, loc2);
+            this.magicFloors.put(Integer.valueOf(id), magicFloor);
+        });
+    }
+
+    /**
+     * Add a magic floor to this arena
+     * @param magicFloor
+     */
+    public void addMagicFloor(final MagicFloor magicFloor) {
+        final int nextId = this.magicFloors.size();
+        this.magicFloors.put(nextId, magicFloor);
+    }
+
+    /**
+     * Save all the magic floors in the arena to the config
+     */
+    public void saveMagicFloors() {
+        final String sectionName = String.format("%s.magic-floors", this.name);
+        ConfigurationSection section = ConfigUtils.INSTANCE.config.getConfigurationSection(sectionName);
+
+        if (ConfigUtils.INSTANCE.config.isConfigurationSection(sectionName) || section == null)
+            section = ConfigUtils.INSTANCE.config.createSection(sectionName);
+
+        final ConfigurationSection finalSection = section;
+
+        this.magicFloors.forEach((id, floor) -> {
+            finalSection.set(String.format("%s.loc-1", id), floor.getLoc1());
+            finalSection.set(String.format("%s.loc-2", id), floor.getLoc2());
         });
 
         ConfigUtils.INSTANCE.save();

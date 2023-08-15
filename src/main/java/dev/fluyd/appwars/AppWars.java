@@ -52,18 +52,35 @@ public final class AppWars extends JavaPlugin {
     }
 
     private void registerCommands() {
-        Bukkit.getPluginCommand("buildmode").setExecutor(new BuildModeCommand());
-        Bukkit.getPluginCommand("test").setExecutor(new TestCommand());
+        Bukkit.getPluginCommand("buildmode").setExecutor(new BuildMode());
+        Bukkit.getPluginCommand("test").setExecutor(new Test());
         Bukkit.getPluginCommand("setspawn").setExecutor(new SetSpawn());
         Bukkit.getPluginCommand("spawn").setExecutor(new Spawn());
         Bukkit.getPluginCommand("start").setExecutor(new Start());
         Bukkit.getPluginCommand("loc").setExecutor(new Loc());
         Bukkit.getPluginCommand("addbutton").setExecutor(new AddButton());
+        Bukkit.getPluginCommand("magicfloor").setExecutor(new MagicFloor());
+        Bukkit.getPluginCommand("wtfthebutton").setExecutor(new WhereIsTheButton());
     }
 
     private void registerTabCompleters() {
-        Bukkit.getPluginCommand("test").setTabCompleter(new TestCommand());
+        Bukkit.getPluginCommand("test").setTabCompleter(new Test());
         Bukkit.getPluginCommand("loc").setTabCompleter(new Loc());
         Bukkit.getPluginCommand("addbutton").setTabCompleter(new AddButton());
+        Bukkit.getPluginCommand("magicfloor").setTabCompleter(new MagicFloor());
+    }
+
+    /**
+     * Returns true if server version is newer
+     * @return
+     */
+    public static boolean isNewApi() {
+        final String version = Bukkit.getVersion().toLowerCase();
+        final String[] oldAPI = { "1.7", "1.8", "1.9", "1.10", "1.11", "1.12" };
+        for (final String ver : oldAPI)
+            if (version.contains(ver))
+                return false;
+
+        return true;
     }
 }

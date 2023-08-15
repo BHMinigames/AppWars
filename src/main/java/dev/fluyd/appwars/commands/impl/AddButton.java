@@ -32,7 +32,7 @@ public final class AddButton extends ArenaTabComplete implements CommandExecutor
 
         final Player p = (Player) sender;
 
-        if (!p.hasPermission("rizon.loc")) {
+        if (!p.hasPermission("rizon.addbutton")) {
             MessagesUtils.sendNoPermissionError(p);
             return true;
         }
@@ -53,6 +53,11 @@ public final class AddButton extends ArenaTabComplete implements CommandExecutor
         final Button button = getButton(p);
         if (button == null || button.getFace() == null || button.getPlaceOn() == null) {
             p.sendMessage(ChatColor.RED + "The block the button should be placed could not be determined.");
+            return true;
+        }
+
+        if (arena.hasButton(button)) {
+            p.sendMessage(ChatColor.RED + "This arena already has this button.");
             return true;
         }
 

@@ -3,6 +3,7 @@ package dev.fluyd.appwars.game;
 import dev.fluyd.appwars.AppWars;
 import dev.fluyd.appwars.game.arena.Arena;
 import dev.fluyd.appwars.game.arena.impl.Maps;
+import dev.fluyd.appwars.game.arena.impl.Parkour;
 import dev.fluyd.appwars.game.arena.impl.Twitter;
 import dev.fluyd.appwars.mirror.Mirror;
 import dev.fluyd.appwars.utils.GameState;
@@ -38,6 +39,7 @@ public final class GameManager {
     public void initArenas() {
         newArena(new Twitter());
         newArena(new Maps());
+        newArena(new Parkour());
     }
 
     private void newArena(final Arena arena) {
@@ -50,6 +52,8 @@ public final class GameManager {
     public void disable() {
         arenas.forEach(Arena::removePlacedBlocks);
         Bukkit.getOnlinePlayers().forEach(p -> p.kickPlayer(ChatColor.RED + "Game restarting")); // To prevent bugs on reload
+
+        playerMirrors.values().forEach(Mirror::deleteNPC);
     }
 
     /**
@@ -186,7 +190,7 @@ public final class GameManager {
         GameManager.players.clear();
         GameManager.arenas.forEach(GameManager::resetArena);
 
-        final List<Arena> randomizedArenas = arenas;
+        final List<Arena> randomizedArenas = arenas.stream().filter(Arena::isAvailable).collect(Collectors.toList());
         Collections.shuffle(randomizedArenas);
 
         final Iterator<Arena> iterator = randomizedArenas.iterator();
@@ -199,6 +203,8 @@ public final class GameManager {
         Collections.shuffle(players);
 
         Arena arena = null;
+        final boolean notEven = players.size() % 2 != 0;
+
         for (final Player op : players) {
             ++playersAssigned;
 
@@ -208,6 +214,9 @@ public final class GameManager {
 
                 arena = iterator.next();
             }
+
+            if (notEven && playersAssigned == players.size())
+                arena = GameManager.getArena("PARKOUR");
 
             final UUID uuid = op.getUniqueId();
 
@@ -253,6 +262,7 @@ public final class GameManager {
 
         p.setGameMode(GameMode.SURVIVAL);
         p.setHealth(p.getMaxHealth());
+        p.getActivePotionEffects().clear();
 
         if (ConfigUtils.INSTANCE.lobbyLocation != null)
             p.teleport(ConfigUtils.INSTANCE.lobbyLocation.clone().add(0, 1, 0));
@@ -269,9 +279,11 @@ public final class GameManager {
         final PlayerInventory inv = p.getInventory();
 
         inv.clear();
+
         inv.setHelmet(null);
         inv.setChestplate(null);
         inv.setLeggings(null);
         inv.setBoots(null);
+        p.setItemOnCursor(null);
     }
 }

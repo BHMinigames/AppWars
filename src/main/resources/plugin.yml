@@ -23,3 +23,9 @@ commands:
   addbutton:
     description: Add a button to an arena
     usage: /addbutton <arena>
+  magicfloor:
+    description: Add a magic floor to an arena
+    usage: /magicfloor <arena>
+  wtfthebutton:
+    description: Tells you the coordinates of the button
+    usage: /wtfthebutton

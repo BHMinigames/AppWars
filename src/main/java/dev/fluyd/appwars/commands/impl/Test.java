@@ -14,7 +14,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
-public class TestCommand implements CommandExecutor, TabCompleter {
+public class Test implements CommandExecutor, TabCompleter {
     static ArrayList<TestFlow> testFlows = new ArrayList<>();
 
     static {

@@ -1,6 +1,6 @@
 package dev.fluyd.appwars.listeners;
 
-import dev.fluyd.appwars.commands.impl.BuildModeCommand;
+import dev.fluyd.appwars.commands.impl.BuildMode;
 import dev.fluyd.appwars.game.GameManager;
 import dev.fluyd.appwars.game.arena.Arena;
 import dev.fluyd.appwars.utils.GameState;
@@ -38,7 +38,7 @@ public class WorldListener implements Listener {
     private boolean handleBuild(final Cancellable e, final Block block, final Player p, final BlockState replacedBlock, final boolean place) {
         final UUID uuid = p.getUniqueId();
 
-        if (BuildModeCommand.BUILD_MODE)
+        if (BuildMode.BUILD_MODE)
             return true;
 
         if (GameManager.state != GameState.STARTED)

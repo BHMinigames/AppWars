@@ -47,7 +47,7 @@ public final class ScoreboardHandler {
 
         board.setAll(String.format("§7%s §8LOCAL", sdf.format(new Date())),
                 "§a ",
-                "§fMap: §aClassic",
+                "§fMap: §aiPhone 6",
                 String.format("§fPlayers: §a%s/%s", Bukkit.getOnlinePlayers().size(), ConfigUtils.INSTANCE.maxPlayers),
                 "§e ",
                 String.format("§fMode: §a%s", GameManager.state == GameState.STARTED && arena != null ? arena.getName() : "Solo"),

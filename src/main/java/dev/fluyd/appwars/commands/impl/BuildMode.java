@@ -7,7 +7,7 @@ import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 
-public class BuildModeCommand implements CommandExecutor {
+public class BuildMode implements CommandExecutor {
     public static boolean BUILD_MODE = false;
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {

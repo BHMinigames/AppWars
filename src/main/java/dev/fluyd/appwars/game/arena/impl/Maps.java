@@ -5,6 +5,7 @@ import dev.fluyd.appwars.game.GameManager;
 import dev.fluyd.appwars.game.arena.AboutArena;
 import dev.fluyd.appwars.game.arena.Arena;
 import dev.fluyd.appwars.utils.GameState;
+import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.GameMode;
 import org.bukkit.Material;
@@ -25,9 +26,9 @@ import java.util.UUID;
 /**
  * Effectively find the button
  */
-@AboutArena(name = "MAPS", allowDropItems = true, subTitle = "&eFind the button before the time is up!")
+@AboutArena(name = "MAPS", allowDropItems = true, allowInteraction = true, subTitle = "&eFind the button before the time is up!")
 public final class Maps extends Arena implements Listener {
-    private AddButton.Button currentButton;
+    private @Getter AddButton.Button currentButton;
     private UUID winner = null;
 
     @Override
@@ -73,6 +74,7 @@ public final class Maps extends Arena implements Listener {
         if (this.currentButton != null)
             this.currentButton.getPlaceOn().getBlock().getRelative(this.currentButton.getFace()).setType(Material.AIR);
 
+        this.currentButton = null;
         this.winner = null;
     }
 
