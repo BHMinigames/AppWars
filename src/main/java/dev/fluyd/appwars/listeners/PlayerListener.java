@@ -69,6 +69,15 @@ public class PlayerListener implements Listener {
     }
 
     @EventHandler
+    public void onPlayerQuit(final PlayerQuitEvent e) {
+        final Player p = e.getPlayer();
+        final UUID uuid = p.getUniqueId();
+
+        if (GameManager.state == GameState.STARTED && !GameManager.players.containsKey(uuid))
+            e.setQuitMessage(null);
+    }
+
+    @EventHandler
     public void onFoodLevelChange(final FoodLevelChangeEvent e) {
         e.setFoodLevel(20);
     }
@@ -171,7 +180,7 @@ public class PlayerListener implements Listener {
         GameManager.eliminated(player, "&eYou died!");
 
         final Player killer = e.getKiller();
-        GameManager.victory(killer, "&eYou won!");
+        GameManager.victory(killer, "&eYou won the duel!");
     }
 
     @EventHandler

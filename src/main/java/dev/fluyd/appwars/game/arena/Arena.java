@@ -196,6 +196,18 @@ public abstract class Arena {
     }
 
     /**
+     * Checks if any of this arena's players has specified uuid
+     * @param uuid
+     * @return
+     */
+    public boolean containsUuid(final UUID uuid) {
+        if (this.uuid1 == null || this.uuid2 == null)
+            return false;
+
+        return this.uuid1.equals(uuid) || this.uuid2.equals(uuid);
+    }
+
+    /**
      * TODO: Change this method to do the slow teleport where it pushes you into the app (Fluyd from the future, hellins brain had a buffer overflow, this is nonsense data)
      */
     protected void teleport() {

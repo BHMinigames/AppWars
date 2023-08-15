@@ -5,7 +5,6 @@ import dev.fluyd.appwars.utils.GameState;
 import dev.fluyd.appwars.utils.MessagesUtils;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
-import org.bukkit.GameMode;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
@@ -30,7 +29,7 @@ public final class Start implements CommandExecutor {
         final List<Player> validPlayers = new ArrayList<>();
 
         for (final Player p : Bukkit.getOnlinePlayers()) {
-            if (p.getGameMode() == GameMode.SPECTATOR || p.isDead())
+            if (GameManager.checkPlayerState(p))
                 continue;
 
             validPlayers.add(p);

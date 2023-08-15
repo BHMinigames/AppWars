@@ -98,7 +98,7 @@ public final class GameManager {
 
                 try {
                     GameManager.roundStartedAt = Instant.now().getEpochSecond();
-                    assignArenas(GameManager.players.keySet()); // Also starts the arena
+                    assignArenas(new HashSet<>(GameManager.players.keySet())); // Also starts the arena
                 } catch (final Exception exception) {
                     exception.printStackTrace();
                     super.cancel();
@@ -108,6 +108,9 @@ public final class GameManager {
     }
 
     public void sendTitle(final Player p, final String title, final String subTitle) {
+        if (p == null)
+            return;
+
         p.sendTitle(ChatColor.translateAlternateColorCodes('&', title), ChatColor.translateAlternateColorCodes('&', subTitle));
     }
 
@@ -147,18 +150,28 @@ public final class GameManager {
         GameManager.players.forEach((uuid, arena) -> {
             final Player p = Bukkit.getPlayer(uuid);
 
-            if (p == null || !p.isOnline()) {
-                toEliminate.add(uuid);
-                return;
-            }
-
-            if (p.isDead() || p.getGameMode() == GameMode.SPECTATOR)
+            if (checkPlayerState(p))
                 toEliminate.add(uuid);
         });
 
         toEliminate.forEach(uuid -> {
             eliminate(uuid);
         });
+    }
+
+    /**
+     * Check whether specified player is eliminated or not
+     * @param p
+     * @return
+     */
+    public boolean checkPlayerState(final Player p) {
+        if (p == null || !p.isOnline())
+            return true;
+
+        if (p.isDead() || p.getGameMode() == GameMode.SPECTATOR)
+            return true;
+
+        return false;
     }
 
     public void eliminate(final UUID uuid) {
@@ -181,7 +194,7 @@ public final class GameManager {
         int playersAssigned = 0;
         List<? extends Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
         if (!uuids.isEmpty())
-            players = new ArrayList<>(uuids.stream().map(Bukkit::getPlayer).filter(p -> p != null && p.isOnline()).collect(Collectors.toList()));
+            players = new ArrayList<>(uuids.stream().map(Bukkit::getPlayer).filter(p -> !checkPlayerState(p)).collect(Collectors.toList()));
 
         Collections.shuffle(players);
 
@@ -217,7 +230,11 @@ public final class GameManager {
         arena.reset();
         arena.removePlacedBlocks();
 
-        arena.getPlayers().forEach(GameManager::clearInv);
+        arena.getPlayers().forEach(p -> {
+            GameManager.clearInv(p);
+            p.setHealth(p.getMaxHealth());
+        });
+
         arena.clearPlayers();
 
         removeDroppedItems(arena.getLoc1().getWorld());
