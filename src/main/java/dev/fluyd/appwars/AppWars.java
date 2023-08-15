@@ -1,6 +1,6 @@
 package dev.fluyd.appwars;
 
-import dev.fluyd.appwars.commands.*;
+import dev.fluyd.appwars.commands.impl.*;
 import dev.fluyd.appwars.game.GameManager;
 import dev.fluyd.appwars.listeners.InitListeners;
 import dev.fluyd.appwars.listeners.KillTrackerListener;
@@ -58,10 +58,12 @@ public final class AppWars extends JavaPlugin {
         Bukkit.getPluginCommand("spawn").setExecutor(new Spawn());
         Bukkit.getPluginCommand("start").setExecutor(new Start());
         Bukkit.getPluginCommand("loc").setExecutor(new Loc());
+        Bukkit.getPluginCommand("addbutton").setExecutor(new AddButton());
     }
 
     private void registerTabCompleters() {
         Bukkit.getPluginCommand("test").setTabCompleter(new TestCommand());
         Bukkit.getPluginCommand("loc").setTabCompleter(new Loc());
+        Bukkit.getPluginCommand("addbutton").setTabCompleter(new AddButton());
     }
 }

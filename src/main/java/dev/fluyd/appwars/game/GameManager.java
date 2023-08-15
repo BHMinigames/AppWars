@@ -2,6 +2,7 @@ package dev.fluyd.appwars.game;
 
 import dev.fluyd.appwars.AppWars;
 import dev.fluyd.appwars.game.arena.Arena;
+import dev.fluyd.appwars.game.arena.impl.Maps;
 import dev.fluyd.appwars.game.arena.impl.Twitter;
 import dev.fluyd.appwars.mirror.Mirror;
 import dev.fluyd.appwars.utils.GameState;
@@ -36,11 +37,14 @@ public final class GameManager {
 
     public void initArenas() {
         newArena(new Twitter());
+        newArena(new Maps());
     }
 
     private void newArena(final Arena arena) {
         if (!arenas.contains(arena))
             arenas.add(arena);
+
+        arena.enable(AppWars.INSTANCE);
     }
 
     public void disable() {
@@ -103,6 +107,18 @@ public final class GameManager {
         }.runTaskTimer(AppWars.INSTANCE, 5L, roundLengthTicks);
     }
 
+    public void sendTitle(final Player p, final String title, final String subTitle) {
+        p.sendTitle(ChatColor.translateAlternateColorCodes('&', title), ChatColor.translateAlternateColorCodes('&', subTitle));
+    }
+
+    public void victory(final Player p, final String subTitle) {
+        sendTitle(p, "&a&lVictory", subTitle);
+    }
+
+    public void eliminated(final Player p, final String subTitle) {
+        sendTitle(p, "&c&lEliminated", subTitle);
+    }
+
     private void resetGame() {
         GameManager.players.clear();
         GameManager.state = GameState.WAITING;
@@ -141,17 +157,26 @@ public final class GameManager {
         });
 
         toEliminate.forEach(uuid -> {
-            GameManager.players.remove(uuid);
-
-            final Player p = Bukkit.getPlayer(uuid);
-            if (p != null)
-                Bukkit.getOnlinePlayers().forEach(op -> op.sendMessage(ChatColor.RED + String.format("%s was eliminated!", p.getName())));
+            eliminate(uuid);
         });
+    }
+
+    public void eliminate(final UUID uuid) {
+        GameManager.players.remove(uuid);
+
+        final Player p = Bukkit.getPlayer(uuid);
+        if (p != null)
+            Bukkit.getOnlinePlayers().forEach(op -> op.sendMessage(ChatColor.RED + String.format("%s was eliminated!", p.getName())));
     }
 
     private void assignArenas(final Set<UUID> uuids) throws Exception {
         GameManager.players.clear();
-        final Iterator<Arena> iterator = arenas.iterator();
+        GameManager.arenas.forEach(GameManager::resetArena);
+
+        final List<Arena> randomizedArenas = arenas;
+        Collections.shuffle(randomizedArenas);
+
+        final Iterator<Arena> iterator = randomizedArenas.iterator();
 
         int playersAssigned = 0;
         List<? extends Player> players = new ArrayList<>(Bukkit.getOnlinePlayers());
@@ -169,7 +194,6 @@ public final class GameManager {
                     throw new Exception("Not enough arenas to start game.");
 
                 arena = iterator.next();
-                resetArena(arena);
             }
 
             final UUID uuid = op.getUniqueId();
@@ -183,12 +207,17 @@ public final class GameManager {
                 GameManager.playerMirrors.put(op, new Mirror(op));
         }
 
-        for (final Arena a : GameManager.arenas)
-            a.start();
+        for (final Arena a : GameManager.arenas) {
+            if (!a.getPlayers().isEmpty())
+                a.start();
+        }
     }
 
     private void resetArena(final Arena arena) {
+        arena.reset();
         arena.removePlacedBlocks();
+
+        arena.getPlayers().forEach(GameManager::clearInv);
         arena.clearPlayers();
 
         removeDroppedItems(arena.getLoc1().getWorld());

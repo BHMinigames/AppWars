@@ -1,4 +1,4 @@
-package dev.fluyd.appwars.commands;
+package dev.fluyd.appwars.commands.impl;
 
 import dev.fluyd.appwars.testflow.TestFlow;
 import dev.fluyd.appwars.testflow.flows.TwitterAnimate;

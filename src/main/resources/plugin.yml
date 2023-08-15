@@ -20,3 +20,6 @@ commands:
     usage: /loc <1 | 2 | 3> <arena>
   start:
     description: Start a game
+  addbutton:
+    description: Add a button to an arena
+    usage: /addbutton <arena>

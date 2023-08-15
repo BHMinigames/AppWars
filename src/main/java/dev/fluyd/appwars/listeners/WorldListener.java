@@ -1,6 +1,6 @@
 package dev.fluyd.appwars.listeners;
 
-import dev.fluyd.appwars.commands.BuildModeCommand;
+import dev.fluyd.appwars.commands.impl.BuildModeCommand;
 import dev.fluyd.appwars.game.GameManager;
 import dev.fluyd.appwars.game.arena.Arena;
 import dev.fluyd.appwars.utils.GameState;

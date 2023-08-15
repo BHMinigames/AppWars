@@ -82,7 +82,9 @@ public class PlayerListener implements Listener {
         final Player p = (Player) entity;
         final UUID uuid = p.getUniqueId();
 
-        if (e.getCause() == EntityDamageEvent.DamageCause.FALL) {
+        final EntityDamageEvent.DamageCause cause = e.getCause();
+
+        if (cause == EntityDamageEvent.DamageCause.FALL) {
             if (GameManager.state != GameState.STARTED) {
                 e.setCancelled(true);
                 return;
@@ -108,8 +110,11 @@ public class PlayerListener implements Listener {
         }
 
         final Arena arena = GameManager.players.get(uuid);
-        if (arena != null && !arena.isPvp())
-            e.setCancelled(true);
+
+        if (cause != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause != EntityDamageEvent.DamageCause.BLOCK_EXPLOSION) {
+            if (arena != null && !arena.isPvp())
+                e.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -163,10 +168,10 @@ public class PlayerListener implements Listener {
         player.setGameMode(GameMode.SPECTATOR);
         player.teleport(e.getKiller().getLocation());
 
-        this.sendTitle(player, "&c&lEliminated", "&eYou died!");
+        GameManager.eliminated(player, "&eYou died!");
 
         final Player killer = e.getKiller();
-        this.sendTitle(killer, "&a&lVictory", "&eYou won!");
+        GameManager.victory(killer, "&eYou won!");
     }
 
     @EventHandler
@@ -223,10 +228,6 @@ public class PlayerListener implements Listener {
 
         if (playerMirror != null && playerMirror.npc != null)
             playerMirror.copyItemToNPC(newItem);
-    }
-
-    private void sendTitle(final Player p, final String title, final String subTitle) {
-        p.sendTitle(ChatColor.translateAlternateColorCodes('&', title), ChatColor.translateAlternateColorCodes('&', subTitle));
     }
 
     private void dropAndClearInventory(final Player player, final Location dropLocation) {

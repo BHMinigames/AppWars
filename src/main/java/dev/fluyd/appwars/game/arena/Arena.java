@@ -1,6 +1,7 @@
 package dev.fluyd.appwars.game.arena;
 
 import dev.fluyd.appwars.AppWars;
+import dev.fluyd.appwars.commands.impl.AddButton;
 import dev.fluyd.appwars.game.GameManager;
 import dev.fluyd.appwars.utils.config.ConfigUtils;
 import lombok.AccessLevel;
@@ -8,18 +9,18 @@ import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.*;
 import org.bukkit.block.Block;
+import org.bukkit.block.BlockFace;
 import org.bukkit.block.BlockState;
+import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionEffect;
 import org.bukkit.potion.PotionEffectType;
 import org.bukkit.scheduler.BukkitRunnable;
 import org.bukkit.util.Vector;
 
 import java.lang.annotation.Annotation;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Getter
 @Setter
@@ -44,6 +45,8 @@ public abstract class Arena {
     private UUID uuid1;
     private UUID uuid2;
 
+    private @Getter(AccessLevel.PROTECTED) Map<Integer, AddButton.Button> buttons = new HashMap<>();
+
     public Arena() {
         final Annotation annotation = this.getClass().getAnnotation(AboutArena.class);
         final AboutArena about = (AboutArena) annotation;
@@ -57,12 +60,24 @@ public abstract class Arena {
         this.subTitle = about.subTitle();
 
         this.setLocations();
+        this.setButtons();
     }
 
     /**
-     * Called when a new round is started
+     * Called when plugin is enabled by Bukkit
      */
-    public abstract void start();
+    public void enable(final JavaPlugin instance) {}
+
+    /**
+     * Called when the arena is reset
+     */
+    public void reset() {}
+
+    /**
+     * Called when a new round is started
+     * Only called if there are players in this arena
+     */
+    public abstract void start() throws Exception;
 
     private void setLocations() {
         this.loc1 = (Location) ConfigUtils.INSTANCE.config.get(String.format("%s.loc-1", this.name));
@@ -112,6 +127,51 @@ public abstract class Arena {
         this.uuid2 = null;
     }
 
+    private void setButtons() {
+        final ConfigurationSection section = ConfigUtils.INSTANCE.config.getConfigurationSection(String.format("%s.buttons", this.name));
+
+        if (section == null)
+            return;
+
+        section.getKeys(false).forEach(id -> {
+            final Location placeOn = (Location) section.get(String.format("%s.place-on", id));
+            final String blockFace = section.getString(String.format("%s.block-face", id));
+
+            final AddButton.Button button = new AddButton.Button(placeOn, BlockFace.valueOf(blockFace));
+            this.buttons.put(Integer.valueOf(id), button);
+        });
+    }
+
+    /**
+     * Add a button location for this arena
+     * @param button
+     */
+    public void addButton(final AddButton.Button button) {
+        final int nextId = this.buttons.size();
+        this.buttons.put(nextId, button);
+    }
+
+    /**
+     * Save all the buttons in the arena to the config
+     */
+    public void saveButtons() {
+        final String sectionName = String.format("%s.buttons", this.name);
+        ConfigurationSection section = ConfigUtils.INSTANCE.config.getConfigurationSection(sectionName);
+
+        if (ConfigUtils.INSTANCE.config.isConfigurationSection(sectionName) || section == null)
+            section = ConfigUtils.INSTANCE.config.createSection(sectionName);
+
+        final ConfigurationSection finalSection = section;
+
+        this.buttons.forEach((id, button) -> {
+            finalSection.set(String.format("%s.place-on", id), button.getPlaceOn());
+            finalSection.set(String.format("%s.block-face", id), button.getFace().name());
+        });
+
+        ConfigUtils.INSTANCE.save();
+        this.setButtons();
+    }
+
     public Player getPlayer1() {
         return Bukkit.getPlayer(this.uuid1);
     }
@@ -121,7 +181,18 @@ public abstract class Arena {
     }
 
     public List<Player> getPlayers() {
-        return Arrays.asList(this.getPlayer1(), this.getPlayer2());
+        final List<Player> players = new ArrayList<>();
+
+        final Player p1 = this.getPlayer1();
+        final Player p2 = this.getPlayer2();
+
+        if (p1 != null)
+            players.add(p1);
+
+        if (p2 != null)
+            players.add(p2);
+
+        return players;
     }
 
     /**
@@ -149,6 +220,22 @@ public abstract class Arena {
      */
     protected boolean startedLongerThan(final long seconds) {
         return GameManager.startedLongerThan(seconds);
+    }
+
+    /**
+     * Gets the other player in the list of players
+     * @param p
+     * @return
+     */
+    protected Player getOtherPlayer(final Player p) {
+        for (final Player player : this.getPlayers()) {
+            if (p == player)
+                continue;
+
+            return player;
+        }
+
+        return null;
     }
 
     /**
