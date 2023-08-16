@@ -20,7 +20,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.*;
 
-@AboutArena(name = "MAIL", allowInteraction = true, subTitle = "&eWrite more english words than your opponent. Sign the book when your done!")
+@AboutArena(name = "MAIL", subTitle = "&eWrite more english words than your opponent. Sign the book when your done!")
 public final class Mail extends Arena implements Listener {
     private List<String> words;
     private Map<UUID, Integer> wordCountMap = new HashMap<>();
