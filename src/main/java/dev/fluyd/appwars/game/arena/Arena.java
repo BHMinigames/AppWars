@@ -242,6 +242,10 @@ public abstract class Arena {
         return Bukkit.getPlayer(this.uuid2);
     }
 
+    /**
+     * Returns a list of all the players in this arena
+     * @return
+     */
     public List<Player> getPlayers() {
         final List<Player> players = new ArrayList<>();
 
@@ -287,6 +291,11 @@ public abstract class Arena {
         this.getPlayers().stream().filter(p -> p != null && p.isOnline()).forEach(p -> p.sendTitle(ChatColor.translateAlternateColorCodes('&', String.format("&a&l%s", this.getName())), ChatColor.translateAlternateColorCodes('&', this.getSubTitle())));
     }
 
+    protected void startMagicFloors() {
+        if (!this.getMagicFloors().isEmpty())
+            this.getMagicFloors().values().forEach(MagicFloor::start);
+    }
+
     /**
      * Check if the game started longer than x amount of seconds ago
      * @param seconds
@@ -310,6 +319,16 @@ public abstract class Arena {
         }
 
         return null;
+    }
+
+    /**
+     * Called when determining who to eliminate
+     * Override this is you need your arena to check for extra stuff than what is already checked in the GameManager class
+     * @param p
+     * @return
+     */
+    public boolean isEliminated(final Player p) {
+        return false;
     }
 
     /**

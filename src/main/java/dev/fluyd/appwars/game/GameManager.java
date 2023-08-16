@@ -2,6 +2,7 @@ package dev.fluyd.appwars.game;
 
 import dev.fluyd.appwars.AppWars;
 import dev.fluyd.appwars.game.arena.Arena;
+import dev.fluyd.appwars.game.arena.impl.Mail;
 import dev.fluyd.appwars.game.arena.impl.Maps;
 import dev.fluyd.appwars.game.arena.impl.Parkour;
 import dev.fluyd.appwars.game.arena.impl.Twitter;
@@ -40,6 +41,7 @@ public final class GameManager {
         newArena(new Twitter());
         newArena(new Maps());
         newArena(new Parkour());
+        newArena(new Mail());
     }
 
     private void newArena(final Arena arena) {
@@ -50,7 +52,7 @@ public final class GameManager {
     }
 
     public void disable() {
-        arenas.forEach(Arena::removePlacedBlocks);
+        GameManager.resetGame();
         Bukkit.getOnlinePlayers().forEach(p -> p.kickPlayer(ChatColor.RED + "Game restarting")); // To prevent bugs on reload
 
         playerMirrors.values().forEach(Mirror::deleteNPC);
@@ -155,6 +157,9 @@ public final class GameManager {
             final Player p = Bukkit.getPlayer(uuid);
 
             if (checkPlayerState(p))
+                toEliminate.add(uuid);
+
+            if (arena.isEliminated(p))
                 toEliminate.add(uuid);
         });
 

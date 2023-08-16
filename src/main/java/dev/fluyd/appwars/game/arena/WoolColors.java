@@ -6,9 +6,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 
-import java.net.HttpURLConnection;
 import java.util.Random;
-import java.util.UUID;
 
 @Getter
 public enum WoolColors {

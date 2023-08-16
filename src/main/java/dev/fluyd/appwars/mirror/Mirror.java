@@ -21,7 +21,6 @@ import org.bukkit.event.player.PlayerTeleportEvent;
 import org.bukkit.inventory.ItemStack;
 
 import java.lang.reflect.Field;
-import java.util.UUID;
 
 public class Mirror {
     // Mirror Coordinates

@@ -69,7 +69,7 @@ public final class Maps extends Arena implements Listener {
         this.placeButton(this.currentButton);
     }
 
-    @EventHandler
+    @Override
     public void reset() {
         if (this.currentButton != null)
             this.currentButton.getPlaceOn().getBlock().getRelative(this.currentButton.getFace()).setType(Material.AIR);

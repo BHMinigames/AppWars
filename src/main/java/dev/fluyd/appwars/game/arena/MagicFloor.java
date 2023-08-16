@@ -30,6 +30,9 @@ public final class MagicFloor {
     }
 
     public void start() {
+        if (task != null)
+            return;
+
         this.task = Bukkit.getScheduler().runTaskTimer(AppWars.INSTANCE, () -> {
             if (GameManager.state != GameState.STARTED)
                 this.cancel();
@@ -51,6 +54,7 @@ public final class MagicFloor {
 
     public void cancel() {
         this.task.cancel();
+        this.task = null;
     }
 
     private List<Block> getBlocks() {
