@@ -115,23 +115,23 @@ public class Mirror {
     public NPC spawnNPC(Location location) {
         NPCRegistry registry = CitizensAPI.getNPCRegistry();
 
-        NPC npc = registry.createNPC(EntityType.PLAYER, "");
+        NPC npc = registry.createNPC(EntityType.PLAYER, player.getDisplayName());
 
         npc.spawn(location);
 
-        EntityPlayer npcEntity = ((CraftPlayer) npc.getEntity()).getHandle();
-        EntityPlayer playerEntity = ((CraftPlayer) player).getHandle();
-
-        GameProfile gameProfile = new GameProfile(player.getUniqueId(), reverseString(player.getName()));
-
-        // Set the GameProfile
-        try {
-            Field profileField = playerEntity.getClass().getSuperclass().getDeclaredField("bH");
-            profileField.setAccessible(true);
-            profileField.set(npcEntity, gameProfile);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
-        }
+//        EntityPlayer npcEntity = ((CraftPlayer) npc.getEntity()).getHandle();
+//        EntityPlayer playerEntity = ((CraftPlayer) player).getHandle();
+//
+//        GameProfile gameProfile = new GameProfile(player.getUniqueId(), reverseString(player.getName()));
+//
+//        // Set the GameProfile
+//        try {
+//            Field profileField = playerEntity.getClass().getSuperclass().getDeclaredField("bH");
+//            profileField.setAccessible(true);
+//            profileField.set(npcEntity, gameProfile);
+//        } catch (NoSuchFieldException | IllegalAccessException e) {
+//            e.printStackTrace();
+//        }
 
         return npc;
     }

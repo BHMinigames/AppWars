@@ -61,6 +61,7 @@ public final class AppWars extends JavaPlugin {
         Bukkit.getPluginCommand("addbutton").setExecutor(new AddButton());
         Bukkit.getPluginCommand("magicfloor").setExecutor(new MagicFloor());
         Bukkit.getPluginCommand("wtfthebutton").setExecutor(new WhereIsTheButton());
+        Bukkit.getPluginCommand("cancel").setExecutor(new Cancel());
     }
 
     private void registerTabCompleters() {

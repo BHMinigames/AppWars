@@ -60,7 +60,7 @@ public class PlayerListener implements Listener {
             e.setJoinMessage(ChatColor.translateAlternateColorCodes('&', String.format("&e%s joined back.", p.getName())));
         else
             e.setJoinMessage(ChatColor.translateAlternateColorCodes('&', String.format("&7(&b%s&7/&b%s&7)&e %s joined.", players, maxPlayers, p.getName())));
-        new ScoreboardHandler(p, "§eAPP WARS");
+        new ScoreboardHandler(p, "§e§lAPP WARS");
 
         if (ConfigUtils.INSTANCE.lobbyLocation != null && GameManager.state != GameState.STARTED)
             GameManager.reset(p);

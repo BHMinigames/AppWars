@@ -81,6 +81,11 @@ public final class GameManager {
         new BukkitRunnable() {
             @Override
             public void run() {
+                if (state == GameState.WAITING) {
+                    super.cancel();
+                    return;
+                }
+
                 checkEveryPlayersSate();
 
                 if (GameManager.players.size() == 1) { // A player won the game
@@ -128,7 +133,7 @@ public final class GameManager {
         sendTitle(p, "&c&lEliminated", subTitle);
     }
 
-    private void resetGame() {
+    public void resetGame() {
         GameManager.players.clear();
         GameManager.state = GameState.WAITING;
 

@@ -29,7 +29,6 @@ public final class Mail extends Arena implements Listener {
     public void start() {
         super.teleport();
         super.sendTitle();
-        super.startMagicFloors();
 
         this.giveBook();
     }
@@ -84,7 +83,7 @@ public final class Mail extends Arena implements Listener {
 
             final InputStream resource = ConfigUtils.class.getClassLoader().getResourceAsStream("words.txt");
             if (resource == null)
-                throw new IOException("resource was null");
+                throw new IOException("words resource was null");
 
             FileUtils.copyInputStreamToFile(resource, tmp);
             resource.close();

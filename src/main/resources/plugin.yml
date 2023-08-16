@@ -5,9 +5,9 @@ load: STARTUP
 depend: [Citizens]
 commands:
   buildmode:
-    description: Toggles build mode.
+    description: Toggles build mode
   test:
-    description: Execute a test flow.
+    description: Execute a test flow
   setspawn:
     description: Set the spawn location
   spawn:
@@ -29,3 +29,6 @@ commands:
   wtfthebutton:
     description: Tells you the coordinates of the button
     usage: /wtfthebutton
+  cancel:
+    description: Cancel the game
+    usage: /cancel

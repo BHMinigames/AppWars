@@ -3,6 +3,7 @@ package dev.fluyd.appwars.game.arena;
 import dev.fluyd.appwars.AppWars;
 import dev.fluyd.appwars.commands.impl.AddButton;
 import dev.fluyd.appwars.game.GameManager;
+import dev.fluyd.appwars.utils.GameState;
 import dev.fluyd.appwars.utils.config.ConfigUtils;
 import lombok.AccessLevel;
 import lombok.Getter;
@@ -353,6 +354,11 @@ public abstract class Arena {
 
             @Override
             public void run() {
+                if (GameManager.state == GameState.WAITING) {
+                    super.cancel();
+                    return;
+                }
+
                 if (count >= 3) {
                     super.cancel();
 
