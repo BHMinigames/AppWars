@@ -354,7 +354,8 @@ public abstract class Arena {
 
             @Override
             public void run() {
-                if (GameManager.state == GameState.WAITING) {
+                if (GameManager.state != GameState.STARTED) {
+                    p.setFlySpeed(originalFlySpeed);
                     super.cancel();
                     return;
                 }

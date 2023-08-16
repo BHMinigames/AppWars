@@ -19,6 +19,7 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.PlayerInventory;
 import org.bukkit.scheduler.BukkitRunnable;
+import org.bukkit.scheduler.BukkitTask;
 
 import java.time.Instant;
 import java.util.*;
@@ -34,6 +35,7 @@ public final class GameManager {
     public final Map<UUID, Arena> players = new HashMap<>();
     public final Map<Player, Mirror> playerMirrors = new HashMap<>();
 
+    public BukkitTask gameTask = null;
     public long startedAt = 0;
     public long roundStartedAt = 0;
 
@@ -78,14 +80,9 @@ public final class GameManager {
         GameManager.state = GameState.STARTED;
         GameManager.startedAt = Instant.now().getEpochSecond();
 
-        new BukkitRunnable() {
+        gameTask = new BukkitRunnable() {
             @Override
             public void run() {
-                if (state == GameState.WAITING) {
-                    super.cancel();
-                    return;
-                }
-
                 checkEveryPlayersSate();
 
                 if (GameManager.players.size() == 1) { // A player won the game
@@ -136,6 +133,7 @@ public final class GameManager {
     public void resetGame() {
         GameManager.players.clear();
         GameManager.state = GameState.WAITING;
+        gameTask.cancel();
 
         if (ConfigUtils.INSTANCE.lobbyLocation != null)
             Bukkit.getOnlinePlayers().forEach(GameManager::reset);
