@@ -133,7 +133,9 @@ public final class GameManager {
     public void resetGame() {
         GameManager.players.clear();
         GameManager.state = GameState.WAITING;
-        gameTask.cancel();
+
+        if (gameTask != null)
+            gameTask.cancel();
 
         if (ConfigUtils.INSTANCE.lobbyLocation != null)
             Bukkit.getOnlinePlayers().forEach(GameManager::reset);
