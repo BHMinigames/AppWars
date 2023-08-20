@@ -1,6 +1,7 @@
 name: AppWars
+authors: [BJEDev, HelliBoi]
 version: '${project.version}'
-main: dev.fluyd.appwars.AppWars
+main: me.bjedev.appwars.AppWars
 load: STARTUP
 depend: [Citizens]
 commands:

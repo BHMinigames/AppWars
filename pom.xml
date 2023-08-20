@@ -48,7 +48,7 @@
                 <artifactId>maven-jar-plugin</artifactId>
                 <version>2.3.1</version>
                 <configuration>
-                    <outputDirectory>C:\Users\josep\OneDrive\Documents\GitHub\AppWars\target</outputDirectory>
+                    <outputDirectory>D:\FHMinigames\Servers\1.8\plugins</outputDirectory>
                 </configuration>
             </plugin>
         </plugins>
