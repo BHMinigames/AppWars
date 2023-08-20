@@ -133,16 +133,44 @@ public final class Paint extends Arena implements Listener {
         final WoolColors color = this.woolColorMap.get(uuid);
         circle.forEach(block -> {
             if (block.getType() != Material.WOOL || woolCountMap.getOrDefault(uuid, new ArrayList<>()).contains(block.getLocation())) return;
+
+            final Player p = Bukkit.getPlayer(uuid);
+            if (p != null) {
+                final Player t = super.getOtherPlayer(p);
+
+                if (t != null) {
+                    final UUID tUuid = t.getUniqueId();
+                    if (this.contains(tUuid, block))
+                        this.del(uuid, block);
+                }
+            }
+
+            this.add(uuid, block);
+
             block.setType(Material.WOOL);
             block.setData(color.getLegacyColorId());
-
-            List<Location> loc = woolCountMap.getOrDefault(uuid, new ArrayList<>());
-            loc.add(block.getLocation());
-
-            woolCountMap.put(uuid, loc);
         });
 
         this.pop(center);
+    }
+
+    private void add(final UUID uuid, final Block block) {
+        List<Location> locs = woolCountMap.getOrDefault(uuid, new ArrayList<>());
+        locs.add(block.getLocation());
+
+        woolCountMap.put(uuid, locs);
+    }
+
+    private void del(final UUID uuid, final Block block) {
+        List<Location> locs = woolCountMap.getOrDefault(uuid, new ArrayList<>());
+        locs.remove(block.getLocation());
+
+        woolCountMap.put(uuid, locs);
+    }
+
+    private boolean contains(final UUID uuid, final Block block) {
+        List<Location> locs = woolCountMap.getOrDefault(uuid, new ArrayList<>());
+        return locs.contains(block.getLocation());
     }
 
     @EventHandler
