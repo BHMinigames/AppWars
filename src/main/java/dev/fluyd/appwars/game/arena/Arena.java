@@ -31,6 +31,7 @@ public abstract class Arena {
 
     private final String name;
     private final boolean pvp;
+    private final boolean damage;
     private final boolean build;
     private final boolean interact;
     private final boolean dropItems;
@@ -56,6 +57,7 @@ public abstract class Arena {
 
         this.name = about.name();
         this.pvp = about.pvp();
+        this.damage = about.damage();
         this.build = about.build();
         this.interact = about.allowInteraction();
         this.dropItems = about.allowDropItems();
@@ -117,6 +119,7 @@ public abstract class Arena {
             block.getBlock().setType(replacedBlock.getType());
             block.getBlock().setData(replacedBlock.getRawData());
         });
+
         this.placedBlocks.clear();
     }
 
@@ -292,9 +295,12 @@ public abstract class Arena {
         this.getPlayers().stream().filter(p -> p != null && p.isOnline()).forEach(p -> p.sendTitle(ChatColor.translateAlternateColorCodes('&', String.format("&a&l%s", this.getName())), ChatColor.translateAlternateColorCodes('&', this.getSubTitle())));
     }
 
-    protected void startMagicFloors() {
-        if (!this.getMagicFloors().isEmpty())
-            this.getMagicFloors().values().forEach(MagicFloor::start);
+    protected void startMagicFloors(final MagicFloor.Type type) {
+        if (this.getMagicFloors().isEmpty())
+            return;
+
+        for (final MagicFloor magicFloor : this.getMagicFloors().values())
+            magicFloor.start(type);
     }
 
     /**

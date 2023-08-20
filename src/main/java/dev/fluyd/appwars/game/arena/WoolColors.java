@@ -60,10 +60,18 @@ public enum WoolColors {
     }
 
     public static WoolColors getRandomColor() {
+        return getRandomColor(null);
+    }
+
+    public static WoolColors getRandomColor(final WoolColors colors) {
         final Random random = new Random();
         final WoolColors[] values = WoolColors.class.getEnumConstants();
         final int randomIndex = random.nextInt(values.length);
 
-        return values[randomIndex];
+        final WoolColors color = values[randomIndex];
+        if (colors == color && colors != null)
+            return getRandomColor(colors);
+
+        return color;
     }
 }

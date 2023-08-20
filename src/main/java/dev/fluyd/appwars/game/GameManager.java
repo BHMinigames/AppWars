@@ -2,10 +2,7 @@ package dev.fluyd.appwars.game;
 
 import dev.fluyd.appwars.AppWars;
 import dev.fluyd.appwars.game.arena.Arena;
-import dev.fluyd.appwars.game.arena.impl.Mail;
-import dev.fluyd.appwars.game.arena.impl.Maps;
-import dev.fluyd.appwars.game.arena.impl.Parkour;
-import dev.fluyd.appwars.game.arena.impl.Twitter;
+import dev.fluyd.appwars.game.arena.impl.*;
 import dev.fluyd.appwars.mirror.Mirror;
 import dev.fluyd.appwars.utils.GameState;
 import dev.fluyd.appwars.utils.config.ConfigUtils;
@@ -42,6 +39,7 @@ public final class GameManager {
     public void initArenas() {
         newArena(new Twitter());
         newArena(new Maps());
+        newArena(new Paint());
         newArena(new Parkour());
         newArena(new Mail());
     }
@@ -255,7 +253,6 @@ public final class GameManager {
         });
 
         arena.clearPlayers();
-
         removeDroppedItems(arena.getLoc1().getWorld());
     }
 

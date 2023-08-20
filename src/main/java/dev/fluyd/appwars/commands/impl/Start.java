@@ -14,6 +14,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public final class Start implements CommandExecutor {
+    private static final int MIN_PLAYERS = 1;
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
         if (!sender.hasPermission("rizon.start")) {
@@ -35,12 +37,12 @@ public final class Start implements CommandExecutor {
             validPlayers.add(p);
         }
 
-        if (Bukkit.getOnlinePlayers().size() <= 1) {
-            sender.sendMessage(ChatColor.RED + "You need at least 2 players to start the game!");
+        if (Bukkit.getOnlinePlayers().size() < MIN_PLAYERS) {
+            sender.sendMessage(ChatColor.RED + String.format("You need at least %s players to start the game!", MIN_PLAYERS));
             return false;
         }
 
-        if (validPlayers.size() <= 1) {
+        if (validPlayers.size() < MIN_PLAYERS) {
             sender.sendMessage(ChatColor.RED + "Some players have not respawned yet!");
             validPlayers.clear();
             return false;

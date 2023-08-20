@@ -2,6 +2,7 @@ package dev.fluyd.appwars.game.arena.impl;
 
 import dev.fluyd.appwars.game.arena.AboutArena;
 import dev.fluyd.appwars.game.arena.Arena;
+import dev.fluyd.appwars.game.arena.MagicFloor;
 
 @AboutArena(name = "PARKOUR", subTitle = "&eWe did not find you an opponent, here is some parkour.", available = false)
 public final class Parkour extends Arena {
@@ -9,6 +10,6 @@ public final class Parkour extends Arena {
     public void start() {
         super.teleport();
         super.sendTitle();
-        super.startMagicFloors();
+        super.startMagicFloors(MagicFloor.Type.LEGACY);
     }
 }

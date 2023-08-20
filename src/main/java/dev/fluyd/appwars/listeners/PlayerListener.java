@@ -128,9 +128,14 @@ public class PlayerListener implements Listener {
 
         final Arena arena = GameManager.players.get(uuid);
 
-        if (cause != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause != EntityDamageEvent.DamageCause.BLOCK_EXPLOSION) {
-            if (arena != null && !arena.isPvp())
-                e.setCancelled(true);
+        if (arena != null) {
+            if (cause != EntityDamageEvent.DamageCause.ENTITY_EXPLOSION || cause != EntityDamageEvent.DamageCause.BLOCK_EXPLOSION) {
+                if (!arena.isPvp())
+                    e.setCancelled(true);
+            }
+
+            if (!arena.isDamage())
+                e.setDamage(0F);
         }
     }
 
