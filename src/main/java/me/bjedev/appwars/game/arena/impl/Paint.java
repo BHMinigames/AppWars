@@ -141,7 +141,7 @@ public final class Paint extends Arena implements Listener {
                 if (t != null) {
                     final UUID tUuid = t.getUniqueId();
                     if (this.contains(tUuid, block))
-                        this.del(uuid, block);
+                        this.del(tUuid, block);
                 }
             }
 

@@ -162,7 +162,7 @@ public final class GameManager {
             if (checkPlayerState(p))
                 toEliminate.add(uuid);
 
-            if (arena.isEliminated(p))
+            if (p == null || arena.isEliminated(p))
                 toEliminate.add(uuid);
         });
 
