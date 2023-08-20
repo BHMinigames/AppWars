@@ -84,6 +84,7 @@ public final class Paint extends Arena implements Listener {
         this.resetFloor();
 
         this.floor = null;
+        this.woolCountMap.clear();
         this.eggThrowMap.clear();
         this.woolColorMap.clear();
 
